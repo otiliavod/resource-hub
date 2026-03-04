@@ -1,0 +1,107 @@
+<app-auth-shell
+  title="Welcome to Resource Hub"
+  subtitle="Manage clients, projects, timesheets and billing — all in one place."
+>
+  <app-auth-switch [mode]="mode" (modeChange)="setMode($event)"></app-auth-switch>
+
+  <div class="content">
+    @if (error) {
+      <p-message severity="error" [text]="error"></p-message>
+    }
+
+    <form class="form" (ngSubmit)="submit()" #f="ngForm">
+      @if (mode === 'signin') {
+        <label class="field">
+          <span>Email</span>
+          <input
+            pInputText
+            name="signInEmail"
+            [(ngModel)]="signInEmail"
+            type="email"
+            placeholder="you@email.com"
+            required
+            autocomplete="email"
+          />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <p-password
+            name="signInPassword"
+            [(ngModel)]="signInPassword"
+            [toggleMask]="true"
+            [feedback]="false"
+            placeholder="Your password"
+            required
+            autocomplete="current-password"
+          ></p-password>
+        </label>
+
+        <button
+          pButton
+          type="submit"
+          class="primary"
+          label="Sign In"
+          [loading]="loading"
+          [disabled]="!f.valid"
+        ></button>
+      }
+
+      @if (mode === 'signup') {
+        <label class="field">
+          <span>Name</span>
+          <input
+            pInputText
+            name="signUpName"
+            [(ngModel)]="signUpName"
+            type="text"
+            placeholder="Your name"
+            required
+            autocomplete="name"
+          />
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input
+            pInputText
+            name="signUpEmail"
+            [(ngModel)]="signUpEmail"
+            type="email"
+            placeholder="you@email.com"
+            required
+            autocomplete="email"
+          />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <p-password
+            name="signUpPassword"
+            [(ngModel)]="signUpPassword"
+            [toggleMask]="true"
+            [feedback]="true"
+            placeholder="Create a password"
+            required
+            autocomplete="new-password"
+          ></p-password>
+        </label>
+
+        <button
+          pButton
+          type="submit"
+          class="primary"
+          label="Create Account"
+          [loading]="loading"
+          [disabled]="!f.valid"
+        ></button>
+
+        <p-divider></p-divider>
+        <p class="hint">
+          Already have an account?
+          <a (click)="setMode('signin')">Sign in</a>
+        </p>
+      }
+    </form>
+  </div>
+</app-auth-shell>

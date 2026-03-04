@@ -1,0 +1,7 @@
+export type Role = 'ADMIN' | 'MANAGER' | 'DEV';
+
+export type LoginRequest = { email: string; password: string };
+export type LoginResponse = { accessToken: string; user: { id: string; email: string; role: Role } };
+
+export type RegisterRequest = { fullName: string; email: string; password: string };
+export type RefreshResponse = { accessToken: string | null };
