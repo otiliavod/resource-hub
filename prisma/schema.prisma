@@ -6,47 +6,39 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  ADMIN
-  MANAGER
-  DEV
-}
-
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  fullName  String
-  role      Role     @default(DEV)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id                 String          @id @default(cuid())
+  email              String          @unique
+  fullName           String
+  role               Role            @default(DEV)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  passwordHash       String
   projectMemberships ProjectMember[]
+  refreshTokens      RefreshToken[]
   timeEntries        TimeEntry[]
 }
 
 model Client {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   email     String?
   phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   projects  Project[]
 }
 
 model Project {
-  id        String   @id @default(cuid())
-  name      String
-  code      String?  @unique
-  clientId  String
-  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  members   ProjectMember[]
+  id          String          @id @default(cuid())
+  name        String
+  code        String?         @unique
+  clientId    String
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  client      Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  members     ProjectMember[]
   timeEntries TimeEntry[]
 }
 
@@ -55,7 +47,6 @@ model ProjectMember {
   projectId String
   userId    String
   createdAt DateTime @default(now())
-
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -70,10 +61,27 @@ model TimeEntry {
   minutes     Int
   description String?
   isBillable  Boolean  @default(true)
-
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  DEV
 }
