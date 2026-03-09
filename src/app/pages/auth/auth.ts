@@ -79,11 +79,21 @@ export class AuthPage {
   private submitSignUp() {
     this.loading = true;
 
-    // You’ll wire this once backend has POST /auth/register (or similar)
-    // For now, friendly placeholder:
-    setTimeout(() => {
-      this.loading = false;
-      this.error = 'Sign up endpoint not connected yet (backend register not implemented).';
-    }, 400);
+    this.auth
+      .register({
+        fullName: this.signUpName.trim(),
+        email: this.signUpEmail.trim(),
+        password: this.signUpPassword,
+      })
+      .subscribe((ok) => {
+        this.loading = false;
+
+        if (!ok) {
+          this.error = 'Could not create account. Email may already be used.';
+          return;
+        }
+
+        this.router.navigateByUrl('/');
+      });
   }
 }

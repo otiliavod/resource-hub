@@ -21,7 +21,6 @@ export class AuthService {
     );
   }
 
-  // Frontend is ready for this, backend endpoint you’ll add next
   register(payload: RegisterRequest) {
     return this.http.post<LoginResponse>('/api/auth/register', payload, { withCredentials: true }).pipe(
       tap((res) => {
