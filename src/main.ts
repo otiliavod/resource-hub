@@ -9,6 +9,7 @@ bootstrapApplication(AppComponent, appConfig)
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from "cookie-parser";
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,6 +24,14 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.listen(process.env.PORT ?? 3000);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 }
 bootstrap();
 >>>>>>> 18a6ce5 (Created project, schema, added docker and nest)

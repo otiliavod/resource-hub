@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AccessJwtGuard } from './guards/access-jwt.guard';
 import { CurrentUser } from './decorators/user.decorator';
+import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,6 +13,13 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const { accessToken, refreshToken, user } = await this.auth.login(dto.email, dto.password);
+    res.cookie('rt', refreshToken, this.auth['refreshCookieOptions']());
+    return { accessToken, user };
+  }
+
+  @Post('register')
+  async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+    const { accessToken, refreshToken, user } = await this.auth.register(dto);
     res.cookie('rt', refreshToken, this.auth['refreshCookieOptions']());
     return { accessToken, user };
   }

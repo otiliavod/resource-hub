@@ -6,6 +6,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@prisma/client';
 import { JwtPayload } from './types/jwt-payload';
 import type { StringValue } from 'ms';
+import { ConflictException } from '@nestjs/common';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +16,35 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
   ) {}
+
+  async register(dto: RegisterDto) {
+    const email = dto.email.trim().toLowerCase();
+
+    const existing = await this.prisma.user.findUnique({ where: { email } });
+    if (existing) throw new ConflictException('Email already in use');
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        fullName: dto.fullName.trim(),
+        passwordHash,
+        role: 'DEV', // default
+      },
+    });
+
+    const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role as Role };
+    const accessToken = await this.signAccessToken(payload);
+    const refreshToken = await this.signRefreshToken(payload);
+
+    const tokenHash = await bcrypt.hash(refreshToken, 10);
+    await this.prisma.refreshToken.create({
+      data: { userId: user.id, tokenHash, expiresAt: this.computeRefreshExpiryDate() },
+    });
+
+    return { accessToken, refreshToken, user: { id: user.id, email: user.email, role: user.role } };
+  }
 
   private accessTtl(): StringValue | number {
     return (this.config.get('JWT_ACCESS_TTL') ?? '15m') as StringValue;
