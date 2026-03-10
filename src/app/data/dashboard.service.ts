@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 import { DashboardSummary } from './dashboard.models';
-import { DASHBOARD_MOCK } from './dashboard.mock';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
+  constructor(private http: HttpClient) {}
+
   getSummary(): Observable<DashboardSummary> {
-    return of(DASHBOARD_MOCK);
+    return this.http.get<DashboardSummary>('/api/dashboard/summary', {
+      withCredentials: true,
+    });
   }
 }

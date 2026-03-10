@@ -7,7 +7,7 @@ import { DashboardSummary } from '../../data/dashboard.models';
 import { StatCardComponent } from '../../components/stat-card/stat-card';
 import { TimesheetSummaryCardComponent } from '../../components/timesheet-summary-card/timesheet-summary-card';
 import { LeaveListCardComponent } from '../../components/leave-list-card/leave-list-card';
-import {DashboardShellComponent} from '../../components/dashboard-shell/dashboard-shell';
+import { DashboardShellComponent } from '../../components/dashboard-shell/dashboard-shell';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -26,10 +26,17 @@ export class DashboardPage {
   private dashboardService = inject(DashboardService);
 
   summary: DashboardSummary | null = null;
+  isLoading = true;
 
   ngOnInit() {
-    this.dashboardService.getSummary().subscribe((summary) => {
-      this.summary = summary;
+    this.dashboardService.getSummary().subscribe({
+      next: (summary) => {
+        this.summary = summary;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      },
     });
   }
 }
