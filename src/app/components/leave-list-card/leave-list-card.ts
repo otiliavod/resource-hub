@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { LeaveItem } from '../../data/dashboard.models';
+
 @Component({
   selector: 'app-leave-list-card',
   standalone: true,
@@ -10,5 +12,5 @@ import { CommonModule } from '@angular/common';
 })
 export class LeaveListCardComponent {
   @Input() title = '';
-  @Input() items: any[] = [];
+  @Input() items: LeaveItem[] = [];
 }

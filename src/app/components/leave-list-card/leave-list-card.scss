@@ -1,0 +1,82 @@
+.leave-card {
+  background: var(--rh-card);
+  border: 1px solid var(--rh-border);
+  border-radius: var(--rh-radius-lg);
+  padding: 22px 24px;
+  min-height: 250px;
+  height: 100%;
+  display: grid;
+  gap: 18px;
+  box-shadow: var(--rh-shadow-md);
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--rh-text);
+}
+
+.leave-list {
+  display: grid;
+  gap: 12px;
+}
+
+.leave-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 16px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.03);
+}
+
+.leave-main {
+  min-width: 0;
+}
+
+.leave-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--rh-text);
+}
+
+.leave-date {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: rgba(15, 23, 42, 0.5);
+}
+
+.leave-status {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  line-height: 1;
+}
+
+.status-approved {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #ea980c;
+}
+
+.status-rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+@media (max-width: 700px) {
+  .leave-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

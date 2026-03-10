@@ -5,7 +5,6 @@ export const DASHBOARD_MOCK: DashboardSummary = {
     { label: 'Hours This Week', value: '32.5', hint: '+2.5h', icon: 'pi pi-clock' },
     { label: 'Leave Balance', value: '18 days', hint: 'of 25', icon: 'pi pi-calendar' },
     { label: 'Team Members', value: '12', hint: 'Active', icon: 'pi pi-users' },
-    { label: 'Utilization', value: '87%', hint: '+3%', icon: 'pi pi-chart-line' },
   ],
   recentTimesheets: [
     { day: 'Mon', hours: 8, formattedHours: '8h' },

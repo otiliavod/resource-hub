@@ -1,0 +1,28 @@
+<div class="timesheet-card">
+  <div class="card-header">
+    <h3>{{ title }}</h3>
+  </div>
+
+  <div class="timesheet-list">
+    @for (item of items; track item.day) {
+      <div class="timesheet-row">
+
+        <div class="day">
+          {{ item.day }}
+        </div>
+
+        <div class="bar-container">
+          <div
+            class="bar"
+            [style.width.%]="(item.hours / 8.5) * 88"
+          ></div>
+        </div>
+
+        <div class="hours">
+          {{ item.formattedHours }}
+        </div>
+
+      </div>
+    }
+  </div>
+</div>
