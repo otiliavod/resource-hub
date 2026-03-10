@@ -44,8 +44,8 @@ export class AuthController {
 
   @UseGuards(AccessJwtGuard)
   @Get('me')
-  me(@CurrentUser() user: any) {
-    return { user };
+  async me(@CurrentUser() user: { sub: string }) {
+    return this.auth.getMe(user.sub);
   }
 }
 

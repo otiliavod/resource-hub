@@ -14,6 +14,6 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'jwt-access') {
   }
 
   validate(payload: JwtPayload) {
-    return payload; // becomes req.user
+    return payload;
   }
 }

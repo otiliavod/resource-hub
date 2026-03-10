@@ -43,7 +43,16 @@ export class AuthService {
       data: { userId: user.id, tokenHash, expiresAt: this.computeRefreshExpiryDate() },
     });
 
-    return { accessToken, refreshToken, user: { id: user.id, email: user.email, role: user.role } };
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 
   private accessTtl(): StringValue | number {
@@ -106,7 +115,16 @@ export class AuthService {
       data: { userId: user.id, tokenHash, expiresAt },
     });
 
-    return { accessToken, refreshToken, user: { id: user.id, email: user.email, role: user.role } };
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 
   async refresh(refreshToken: string) {
@@ -171,5 +189,23 @@ export class AuthService {
       if (ok) return c.id;
     }
     return null;
+  }
+
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return user;
   }
 }
