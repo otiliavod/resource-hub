@@ -2,8 +2,8 @@
   background: var(--rh-card);
   border: 1px solid var(--rh-border);
   border-radius: var(--rh-radius-lg);
-  padding: 20px 22px;
-  min-height: 112px;
+  padding: 18px 20px;
+  min-height: 96px;
   display: grid;
   gap: 10px;
   box-shadow: var(--rh-shadow-md);
@@ -40,7 +40,7 @@
 }
 
 .stat-value {
-  font-size: 1.15rem;
+  font-size: 1.4rem;
   line-height: 1.2;
   font-weight: 700;
   color: var(--rh-text);

@@ -20,6 +20,7 @@
 .leave-list {
   display: grid;
   gap: 12px;
+  align-content: start;
 }
 
 .leave-row {
@@ -29,8 +30,8 @@
   gap: 16px;
   padding: 16px 16px;
   border-radius: 14px;
-  background: #f8fafc;
-  border: 1px solid rgba(15, 23, 42, 0.03);
+  background: rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(15, 23, 42, 0.05);
 }
 
 .leave-main {

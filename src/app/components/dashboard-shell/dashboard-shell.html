@@ -1,13 +1,15 @@
 <div class="shell">
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brand">
-      <i class="pi pi-box"></i>
-      <span>ResourceHub</span>
+      <div class="brand-icon">
+        <i class="pi pi-box"></i>
+      </div>
+
+      <span class="brand-label">ResourceHub</span>
     </div>
 
     <nav class="nav">
-      <a routerLink="/dashboard" routerLinkActive="active">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <i class="pi pi-home"></i>
         <span>Overview</span>
       </a>
@@ -25,7 +27,8 @@
 
     <div class="bottom">
       <div class="user">
-        Signed in as <strong>{{ userLabel$ | async }}</strong>
+        <span class="user-caption">Signed in as</span>
+        <strong>{{ userLabel$ | async }}</strong>
       </div>
 
       <button type="button" class="logout" (click)="signOut()">
@@ -35,7 +38,6 @@
     </div>
   </aside>
 
-  <!-- Main content -->
   <main class="content">
     <ng-content></ng-content>
   </main>

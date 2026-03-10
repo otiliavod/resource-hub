@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 
 import { AuthService } from '../../data/auth.service';
 
@@ -18,6 +18,7 @@ export class DashboardShellComponent {
 
   userLabel$ = this.auth.me().pipe(
     map((user) => user.fullName || 'User'),
+    shareReplay(1),
   );
 
   signOut() {
