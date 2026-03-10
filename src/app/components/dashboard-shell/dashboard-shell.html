@@ -1,0 +1,42 @@
+<div class="shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <i class="pi pi-box"></i>
+      <span>ResourceHub</span>
+    </div>
+
+    <nav class="nav">
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <i class="pi pi-home"></i>
+        <span>Overview</span>
+      </a>
+
+      <a>
+        <i class="pi pi-clock"></i>
+        <span>Timesheet</span>
+      </a>
+
+      <a>
+        <i class="pi pi-calendar"></i>
+        <span>Annual Leave</span>
+      </a>
+    </nav>
+
+    <div class="bottom">
+      <div class="user">
+        Signed in as <strong>{{ userLabel$ | async }}</strong>
+      </div>
+
+      <button type="button" class="logout" (click)="signOut()">
+        <i class="pi pi-sign-out"></i>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="content">
+    <ng-content></ng-content>
+  </main>
+</div>

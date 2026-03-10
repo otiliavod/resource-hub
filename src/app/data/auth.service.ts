@@ -68,4 +68,10 @@ export class AuthService {
     localStorage.removeItem(this.accessTokenKey);
     this.accessToken$.next(null);
   }
+
+  me() {
+    return this.http.get<{ id: string; fullName: string; email: string; role: string }>('/api/auth/me', {
+      withCredentials: true,
+    });
+  }
 }
