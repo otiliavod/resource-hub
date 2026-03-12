@@ -1,17 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
 import { DividerModule } from 'primeng/divider';
 
-import { AuthShellComponent } from '../../components/auth-shell/auth-shell';
-import { AuthSwitchComponent, AuthMode } from '../../components/auth-switch/auth-switch';
 import { AuthService } from '../../data/auth.service';
+import { AuthShellComponent } from '../../components/auth-shell/auth-shell';
+import { AuthSwitchComponent } from '../../components/auth-switch/auth-switch';
 
 @Component({
   selector: 'app-auth-page',
@@ -19,13 +19,12 @@ import { AuthService } from '../../data/auth.service';
   imports: [
     CommonModule,
     FormsModule,
-    AuthShellComponent,
-    AuthSwitchComponent,
     InputTextModule,
     PasswordModule,
     ButtonModule,
-    MessageModule,
     DividerModule,
+    AuthShellComponent,
+    AuthSwitchComponent,
   ],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
@@ -33,67 +32,67 @@ import { AuthService } from '../../data/auth.service';
 export class AuthPage {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
-  mode: AuthMode = 'signin';
+  mode: 'signin' | 'signup' = 'signin';
+  fullName = '';
+  email = '';
+  password = '';
+  isSubmitting = false;
+  errorMessage = '';
 
-  // sign in
-  signInEmail = '';
-  signInPassword = '';
-
-  // sign up
-  signUpName = '';
-  signUpEmail = '';
-  signUpPassword = '';
-
-  loading = false;
-  error: string | null = null;
-
-  setMode(mode: AuthMode) {
+  setMode(mode: 'signin' | 'signup') {
     this.mode = mode;
-    this.error = null;
-    this.loading = false;
+    this.errorMessage = '';
+    this.fullName = '';
+    this.email = '';
+    this.password = '';
+    this.isSubmitting = false;
+    this.cdr.detectChanges();
   }
 
   submit() {
-    this.error = null;
+    if (this.isSubmitting) {
+      return;
+    }
 
-    if (this.mode === 'signin') return this.submitSignIn();
-    return this.submitSignUp();
-  }
+    this.errorMessage = '';
+    this.isSubmitting = true;
+    this.cdr.detectChanges();
 
-  private submitSignIn() {
-    this.loading = true;
+    const request$ =
+      this.mode === 'signin'
+        ? this.auth.login({
+          email: this.email,
+          password: this.password,
+        })
+        : this.auth.register({
+          fullName: this.fullName,
+          email: this.email,
+          password: this.password,
+        });
 
-    this.auth.login({ email: this.signInEmail.trim(), password: this.signInPassword }).subscribe((ok) => {
-      this.loading = false;
+    request$
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (result) => {
+          if (result.success) {
+            this.router.navigateByUrl('/dashboard');
+            return;
+          }
 
-      if (!ok) {
-        this.error = 'Invalid email or password.';
-        return;
-      }
-
-      this.router.navigateByUrl('/');
-    });
-  }
-
-  private submitSignUp() {
-    this.loading = true;
-
-    this.auth
-      .register({
-        fullName: this.signUpName.trim(),
-        email: this.signUpEmail.trim(),
-        password: this.signUpPassword,
-      })
-      .subscribe((ok) => {
-        this.loading = false;
-
-        if (!ok) {
-          this.error = 'Could not create account. Email may already be used.';
-          return;
-        }
-
-        this.router.navigateByUrl('/');
+          this.errorMessage = result.message ?? 'Something went wrong.';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.errorMessage = 'Unable to complete the request right now.';
+          this.cdr.detectChanges();
+        },
       });
   }
 }

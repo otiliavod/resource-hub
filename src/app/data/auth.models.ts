@@ -5,3 +5,8 @@ export type LoginResponse = { accessToken: string; user: { id: string; email: st
 
 export type RegisterRequest = { fullName: string; email: string; password: string };
 export type RefreshResponse = { accessToken: string | null };
+
+export type AuthActionResult = {
+  success: boolean;
+  message?: string;
+};

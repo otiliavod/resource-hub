@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, of, tap } from 'rxjs';
-import { LoginRequest, LoginResponse, RegisterRequest, RefreshResponse } from './auth.models';
+
+import {
+  AuthActionResult,
+  LoginRequest,
+  LoginResponse,
+  RefreshResponse,
+  RegisterRequest,
+} from './auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -10,14 +17,40 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+  private extractErrorMessage(error: any, fallback: string): string {
+    const message = error?.error?.message;
+
+    if (Array.isArray(message) && message.length > 0) {
+      return message.join(' ');
+    }
+
+    if (typeof message === 'string' && message.trim().length > 0) {
+      return message;
+    }
+
+    return fallback;
+  }
+
   login(payload: LoginRequest) {
     return this.http.post<LoginResponse>('/api/auth/login', payload, { withCredentials: true }).pipe(
       tap((res) => {
         localStorage.setItem(this.accessTokenKey, res.accessToken);
         this.accessToken$.next(res.accessToken);
       }),
-      map(() => true),
-      catchError(() => of(false)),
+      map((): AuthActionResult => ({
+        success: true,
+      })),
+      catchError((error) => {
+        const message =
+          error?.status === 401
+            ? 'Invalid email or password.'
+            : this.extractErrorMessage(error, 'Unable to sign in right now.');
+
+        return of<AuthActionResult>({
+          success: false,
+          message,
+        });
+      }),
     );
   }
 
@@ -27,8 +60,15 @@ export class AuthService {
         localStorage.setItem(this.accessTokenKey, res.accessToken);
         this.accessToken$.next(res.accessToken);
       }),
-      map(() => true),
-      catchError(() => of(false)),
+      map((): AuthActionResult => ({
+        success: true,
+      })),
+      catchError((error) => {
+        return of<AuthActionResult>({
+          success: false,
+          message: this.extractErrorMessage(error, 'Unable to create your account right now.'),
+        });
+      }),
     );
   }
 
