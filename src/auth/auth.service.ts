@@ -25,13 +25,25 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email,
-        fullName: dto.fullName.trim(),
-        passwordHash,
-        role: 'DEV', // default
-      },
+    const user = await this.prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          email,
+          fullName: dto.fullName.trim(),
+          passwordHash,
+          role: 'DEV',
+        },
+      });
+
+      await tx.leaveBalance.create({
+        data: {
+          userId: createdUser.id,
+          annualAllowance: 25,
+          usedDays: '0',
+        },
+      });
+
+      return createdUser;
     });
 
     const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role as Role };

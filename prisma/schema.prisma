@@ -17,6 +17,8 @@ model User {
   projectMemberships ProjectMember[]
   refreshTokens      RefreshToken[]
   timeEntries        TimeEntry[]
+  leaveBalance       LeaveBalance?
+  leaveRequests      LeaveRequest[]
 }
 
 model Client {
@@ -65,6 +67,36 @@ model TimeEntry {
   updatedAt   DateTime @updatedAt
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model LeaveBalance {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  annualAllowance Int      @default(25)
+  usedDays        Decimal  @default(0) @db.Decimal(5, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LeaveRequest {
+  id        String      @id @default(cuid())
+  userId    String
+  type      LeaveType   @default(ANNUAL)
+  status    LeaveStatus @default(PENDING)
+  startDate DateTime
+  endDate   DateTime
+  daysCount Decimal     @db.Decimal(5, 2)
+  reason    String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startDate])
+  @@index([userId, status])
+  @@index([status, startDate])
 }
 
 model RefreshToken {
@@ -84,4 +116,17 @@ enum Role {
   ADMIN
   MANAGER
   DEV
+}
+
+enum LeaveType {
+  ANNUAL
+  PERSONAL
+  SICK
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
