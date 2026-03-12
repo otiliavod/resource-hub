@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 
 import {
   AuthActionResult,
+  AuthUser,
   LoginRequest,
   LoginResponse,
   RefreshResponse,
@@ -13,7 +14,9 @@ import {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private accessTokenKey = 'rh_access_token';
+
   accessToken$ = new BehaviorSubject<string | null>(this.getAccessToken());
+  currentUser$ = new BehaviorSubject<AuthUser | null>(null);
 
   constructor(private http: HttpClient) {}
 
@@ -36,6 +39,7 @@ export class AuthService {
       tap((res) => {
         localStorage.setItem(this.accessTokenKey, res.accessToken);
         this.accessToken$.next(res.accessToken);
+        this.currentUser$.next(res.user);
       }),
       map((): AuthActionResult => ({
         success: true,
@@ -59,6 +63,7 @@ export class AuthService {
       tap((res) => {
         localStorage.setItem(this.accessTokenKey, res.accessToken);
         this.accessToken$.next(res.accessToken);
+        this.currentUser$.next(res.user);
       }),
       map((): AuthActionResult => ({
         success: true,
@@ -107,11 +112,20 @@ export class AuthService {
   clear() {
     localStorage.removeItem(this.accessTokenKey);
     this.accessToken$.next(null);
+    this.currentUser$.next(null);
   }
 
-  me() {
-    return this.http.get<{ id: string; fullName: string; email: string; role: string }>('/api/auth/me', {
+  me(): Observable<AuthUser> {
+    const cachedUser = this.currentUser$.value;
+
+    if (cachedUser) {
+      return of(cachedUser);
+    }
+
+    return this.http.get<AuthUser>('/api/auth/me', {
       withCredentials: true,
-    });
+    }).pipe(
+      tap((user) => this.currentUser$.next(user)),
+    );
   }
 }

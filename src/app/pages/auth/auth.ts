@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { InputTextModule } from 'primeng/inputtext';
@@ -31,7 +30,6 @@ import { AuthSwitchComponent } from '../../components/auth-switch/auth-switch';
 })
 export class AuthPage {
   private auth = inject(AuthService);
-  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   mode: 'signin' | 'signup' = 'signin';
@@ -82,15 +80,11 @@ export class AuthPage {
       .subscribe({
         next: (result) => {
           if (result.success) {
-            this.router.navigateByUrl('/dashboard');
+            window.location.href = '/dashboard';
             return;
           }
 
           this.errorMessage = result.message ?? 'Something went wrong.';
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.errorMessage = 'Unable to complete the request right now.';
           this.cdr.detectChanges();
         },
       });

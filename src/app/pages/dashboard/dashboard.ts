@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DashboardService } from '../../data/dashboard.service';
@@ -22,21 +22,51 @@ import { DashboardShellComponent } from '../../components/dashboard-shell/dashbo
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit {
   private dashboardService = inject(DashboardService);
 
   summary: DashboardSummary | null = null;
   isLoading = true;
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.loadSummary();
+  }
+
+  loadSummary(): void {
+    this.isLoading = true;
+
     this.dashboardService.getSummary().subscribe({
       next: (summary) => {
         this.summary = summary;
         this.isLoading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Failed to load dashboard summary', error);
+        this.summary = null;
         this.isLoading = false;
       },
     });
+  }
+
+  testLeave() {
+    fetch('/api/leave/request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('rh_access_token'),
+      },
+      body: JSON.stringify({
+        type: 'ANNUAL',
+        startDate: '2026-03-16',
+        endDate: '2026-03-18',
+        reason: 'Testing leave request',
+      }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        console.log(data);
+        this.loadSummary();
+      })
+      .catch((error) => console.error(error));
   }
 }

@@ -1,33 +1,37 @@
 <app-dashboard-shell>
-<div class="dashboard-page">
-  <div class="hero">
-    <h1>Dashboard</h1>
-    <p>Welcome back. Here's your summary.</p>
+  <div class="dashboard-page">
+    <div class="hero">
+      <h1>Dashboard</h1>
+      <p>Welcome back. Here's your summary.</p>
+    </div>
+
+    @if (isLoading) {
+      <p>Loading dashboard...</p>
+    } @else if (summary) {
+      <div class="stats-grid">
+        @for (stat of summary.stats; track stat.label) {
+          <app-stat-card
+            [label]="stat.label"
+            [value]="stat.value"
+            [hint]="stat.hint"
+            [icon]="stat.icon"
+          ></app-stat-card>
+        }
+      </div>
+
+      <div class="content-grid">
+        <app-timesheet-summary-card
+          title="Recent Timesheets"
+          [items]="summary.recentTimesheets"
+        ></app-timesheet-summary-card>
+
+        <app-leave-list-card
+          title="Upcoming Leave"
+          [items]="summary.upcomingLeave"
+        ></app-leave-list-card>
+      </div>
+    } @else {
+      <p>Unable to load dashboard data.</p>
+    }
   </div>
-
-  @if (summary) {
-    <div class="stats-grid">
-      @for (stat of summary.stats; track stat.label) {
-        <app-stat-card
-          [label]="stat.label"
-          [value]="stat.value"
-          [hint]="stat.hint"
-          [icon]="stat.icon"
-        ></app-stat-card>
-      }
-    </div>
-
-    <div class="content-grid">
-      <app-timesheet-summary-card
-        title="Recent Timesheets"
-        [items]="summary.recentTimesheets"
-      ></app-timesheet-summary-card>
-
-      <app-leave-list-card
-        title="Upcoming Leave"
-        [items]="summary.upcomingLeave"
-      ></app-leave-list-card>
-    </div>
-  }
-</div>
 </app-dashboard-shell>

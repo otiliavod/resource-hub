@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { map, shareReplay } from 'rxjs/operators';
+import { RouterModule } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 import { AuthService } from '../../data/auth.service';
 
@@ -14,16 +14,14 @@ import { AuthService } from '../../data/auth.service';
 })
 export class DashboardShellComponent {
   private auth = inject(AuthService);
-  private router = inject(Router);
 
   userLabel$ = this.auth.me().pipe(
     map((user) => user.fullName || 'User'),
-    shareReplay(1),
   );
 
   signOut() {
     this.auth.logout().subscribe(() => {
-      this.router.navigateByUrl('/auth');
+      window.location.href = '/auth';
     });
   }
 }
