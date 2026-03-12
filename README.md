@@ -1,59 +1,154 @@
-# Frontend
+# Resource Hub
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+Resource Hub is a full-stack web application for managing clients, projects, timesheets, and employee leave in one place.
 
-## Development server
+It is built with a modern Angular frontend and a NestJS backend, using PostgreSQL with Prisma ORM.
 
-To start a local development server, run:
+## Tech Stack
+
+### Frontend
+
+- Angular 21 (standalone components)
+- PrimeNG UI library
+- SCSS styling
+- RxJS
+- Angular Router
+- HTTP Interceptor for authentication
+
+### Backend
+
+- NestJS
+- Prisma ORM
+- PostgreSQL
+- JWT Authentication
+- bcrypt password hashing
+- class-validator for request validation
+
+### Infrastructure
+
+- Docker
+- Docker Compose
+- PostgreSQL container
+
+## Features
+
+### Authentication
+
+- Register and login
+- JWT access tokens
+- Refresh token rotation
+- Secure cookie refresh flow
+- Password validation rules
+
+### Dashboard
+
+- Weekly hours summary
+- Timesheet activity visualization
+- Team member stats
+- Upcoming leave overview
+
+### Leave Management
+
+- Leave balance tracking
+- Leave request system
+- Approval status (pending, approved, rejected)
+
+### Projects & Clients
+
+- Client management
+- Project tracking
+- Project team membership
+- Time tracking per project
+
+## Getting started
+
+### 1. Clone the repository
 
 ```bash
-ng serve
+git clone https://github.com/yourusername/resource-hub.git
+cd resource-hub
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 2. Running the database (Docker)
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Start PostgreSQL using Docker: 
 
 ```bash
-ng generate component component-name
+docker compose up -d
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Verify it's working:
 
 ```bash
-ng generate --help
+docker ps
 ```
 
-## Building
+The database will run on: localhost:5432
 
-To build the project run:
+## Backend setup
+
+Navigate to backend
 
 ```bash
-ng build
+cd backend
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Install dependencies:
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Create .env file:
 
 ```bash
-ng e2e
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/appdb"
+JWT_ACCESS_SECRET=supersecret
+JWT_REFRESH_SECRET=supersecret
+JWT_ACCESS_TTL=15m
+JWT_REFRESH_TTL=7d
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Run migrations: 
 
-## Additional Resources
+```bash
+npx prisma migrate dev
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Generate Prisma client:
+
+```bash
+npx prisma generate
+```
+
+Start backend:
+
+```bash
+npm run start:dev
+```
+
+Backend runs on: localhost:3000
+
+## Frontend setup
+
+Navigate to frontend
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+
+```bash
+npm install
+```
+
+Start frontend:
+
+```bash
+ ng serve --proxy-config proxy.conf.json
+```
+
+Frontend runs on: localhost:4200
