@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { LeaveStatus, LeaveType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -15,12 +16,10 @@ type TimesheetSummaryItem = {
   formattedHours: string;
 };
 
-type LeaveStatus = 'approved' | 'pending' | 'rejected';
-
 type LeaveItem = {
   title: string;
   dateLabel: string;
-  status: LeaveStatus;
+  status: 'approved' | 'pending' | 'rejected';
 };
 
 type DashboardSummary = {
@@ -36,8 +35,9 @@ export class DashboardService {
   async getSummary(userId: string): Promise<DashboardSummary> {
     const startOfWeek = this.getStartOfWeek(new Date());
     const endOfWeek = this.getEndOfWeek(startOfWeek);
+    const today = this.startOfDay(new Date());
 
-    const [timeEntries, activeTeamMembers] = await Promise.all([
+    const [timeEntries, activeTeamMembers, leaveBalance, upcomingLeave] = await Promise.all([
       this.prisma.timeEntry.findMany({
         where: {
           userId,
@@ -59,10 +59,35 @@ export class DashboardService {
           role: 'DEV',
         },
       }),
+      this.prisma.leaveBalance.findUnique({
+        where: { userId },
+        select: {
+          annualAllowance: true,
+          usedDays: true,
+        },
+      }),
+      this.prisma.leaveRequest.findMany({
+        where: {
+          userId,
+          endDate: { gte: today },
+        },
+        orderBy: [{ startDate: 'asc' }, { createdAt: 'asc' }],
+        select: {
+          type: true,
+          status: true,
+          startDate: true,
+          endDate: true,
+        },
+        take: 3,
+      }),
     ]);
 
     const recentTimesheets = this.buildWeeklyTimesheetSummary(timeEntries);
     const totalWeekHours = recentTimesheets.reduce((sum, item) => sum + item.hours, 0);
+
+    const annualAllowance = leaveBalance?.annualAllowance ?? 25;
+    const usedDays = Number(leaveBalance?.usedDays ?? 0);
+    const remainingDays = Math.max(annualAllowance - usedDays, 0);
 
     return {
       stats: [
@@ -74,8 +99,8 @@ export class DashboardService {
         },
         {
           label: 'Leave Balance',
-          value: '25 days',
-          hint: 'default allowance',
+          value: `${this.formatNumber(remainingDays)} days`,
+          hint: `${this.formatNumber(usedDays)} used of ${annualAllowance}`,
           icon: 'pi pi-calendar',
         },
         {
@@ -86,28 +111,16 @@ export class DashboardService {
         },
       ],
       recentTimesheets,
-      upcomingLeave: [
-        {
-          title: 'Annual Leave',
-          dateLabel: 'Mar 15–17',
-          status: 'approved',
-        },
-        {
-          title: 'Personal Day',
-          dateLabel: 'Apr 2',
-          status: 'pending',
-        },
-        {
-          title: 'Annual Leave',
-          dateLabel: 'Apr 18–22',
-          status: 'pending',
-        },
-      ],
+      upcomingLeave: upcomingLeave.map((item) => ({
+        title: this.formatLeaveType(item.type),
+        dateLabel: this.formatLeaveDateRange(item.startDate, item.endDate),
+        status: item.status.toLowerCase() as LeaveItem['status'],
+      })),
     };
   }
 
   private buildWeeklyTimesheetSummary(
-      entries: Array<{ date: Date; minutes: number }>,
+    entries: Array<{ date: Date; minutes: number }>,
   ): TimesheetSummaryItem[] {
     const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     const dayMinutes = [0, 0, 0, 0, 0];
@@ -128,6 +141,37 @@ export class DashboardService {
         formattedHours: `${this.formatNumber(hours)}h`,
       };
     });
+  }
+
+  private formatLeaveType(type: LeaveType): string {
+    switch (type) {
+      case LeaveType.ANNUAL:
+        return 'Annual Leave';
+      case LeaveType.PERSONAL:
+        return 'Personal Leave';
+      case LeaveType.SICK:
+        return 'Sick Leave';
+      case LeaveType.UNPAID:
+        return 'Unpaid Leave';
+      default:
+        return 'Leave';
+    }
+  }
+
+  private formatLeaveDateRange(startDate: Date, endDate: Date): string {
+    const sameDay = startDate.getTime() === endDate.getTime();
+
+    const startLabel = this.formatShortDate(startDate);
+    const endLabel = this.formatShortDate(endDate);
+
+    return sameDay ? startLabel : `${startLabel}–${endLabel}`;
+  }
+
+  private formatShortDate(date: Date): string {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
   }
 
   private getWeekdayIndex(date: Date): number {
@@ -151,6 +195,12 @@ export class DashboardService {
     result.setDate(result.getDate() + 4);
     result.setHours(23, 59, 59, 999);
 
+    return result;
+  }
+
+  private startOfDay(date: Date): Date {
+    const result = new Date(date);
+    result.setHours(0, 0, 0, 0);
     return result;
   }
 

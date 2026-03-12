@@ -1,12 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import ms from 'ms';
+
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@prisma/client';
 import { JwtPayload } from './types/jwt-payload';
 import type { StringValue } from 'ms';
-import { ConflictException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
@@ -52,7 +53,11 @@ export class AuthService {
 
     const tokenHash = await bcrypt.hash(refreshToken, 10);
     await this.prisma.refreshToken.create({
-      data: { userId: user.id, tokenHash, expiresAt: this.computeRefreshExpiryDate() },
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: this.computeRefreshExpiryDate(),
+      },
     });
 
     return {
@@ -103,7 +108,12 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const user = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const ok = await bcrypt.compare(password, user.passwordHash);
@@ -121,10 +131,12 @@ export class AuthService {
 
     const tokenHash = await bcrypt.hash(refreshToken, 10);
 
-    // Store refresh token hash
-    const expiresAt = this.computeRefreshExpiryDate();
     await this.prisma.refreshToken.create({
-      data: { userId: user.id, tokenHash, expiresAt },
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: this.computeRefreshExpiryDate(),
+      },
     });
 
     return {
@@ -141,6 +153,7 @@ export class AuthService {
 
   async refresh(refreshToken: string) {
     let payload: JwtPayload;
+
     try {
       payload = await this.jwt.verifyAsync<JwtPayload>(refreshToken, {
         secret: this.config.getOrThrow('JWT_REFRESH_SECRET'),
@@ -149,29 +162,38 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Find non-revoked tokens for user and compare hashes
     const tokens = await this.prisma.refreshToken.findMany({
-      where: { userId: payload.sub, revokedAt: null, expiresAt: { gt: new Date() } },
+      where: {
+        userId: payload.sub,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
       orderBy: { createdAt: 'desc' },
       take: 10,
     });
 
-    const match = await this.findMatchingToken(tokens.map(t => ({ id: t.id, hash: t.tokenHash })), refreshToken);
+    const match = await this.findMatchingToken(
+      tokens.map((t) => ({ id: t.id, hash: t.tokenHash })),
+      refreshToken,
+    );
+
     if (!match) throw new UnauthorizedException('Refresh token not recognized');
 
-    // Rotate: revoke old, issue new
     await this.prisma.refreshToken.update({
       where: { id: match },
       data: { revokedAt: new Date() },
     });
 
-    const newPayload: JwtPayload = payload;
-    const newAccessToken = await this.signAccessToken(newPayload);
-    const newRefreshToken = await this.signRefreshToken(newPayload);
+    const newAccessToken = await this.signAccessToken(payload);
+    const newRefreshToken = await this.signRefreshToken(payload);
     const newHash = await bcrypt.hash(newRefreshToken, 10);
 
     await this.prisma.refreshToken.create({
-      data: { userId: payload.sub, tokenHash: newHash, expiresAt: this.computeRefreshExpiryDate() },
+      data: {
+        userId: payload.sub,
+        tokenHash: newHash,
+        expiresAt: this.computeRefreshExpiryDate(),
+      },
     });
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
@@ -185,11 +207,15 @@ export class AuthService {
   }
 
   private computeRefreshExpiryDate() {
-    // Simple approach: 7 days default if you keep JWT_REFRESH_TTL="7d"
-    // (You can parse ttl precisely later; this is fine if you treat DB as secondary.)
-    const d = new Date();
-    d.setDate(d.getDate() + 7);
-    return d;
+    const ttl = this.refreshTtl();
+    const now = Date.now();
+
+    if (typeof ttl === 'number') {
+      return new Date(now + ttl * 1000);
+    }
+
+    const durationMs = ms(ttl);
+    return new Date(now + durationMs);
   }
 
   private async findMatchingToken(
@@ -200,6 +226,7 @@ export class AuthService {
       const ok = await bcrypt.compare(token, c.hash);
       if (ok) return c.id;
     }
+
     return null;
   }
 
