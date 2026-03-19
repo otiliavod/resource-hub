@@ -142,4 +142,29 @@ export class LeaveService {
     const msPerDay = 1000 * 60 * 60 * 24;
     return (endDate.getTime() - startDate.getTime()) / msPerDay + 1;
   }
+
+  async deleteRequest(userId: string, requestId: string) {
+    const existing = await this.prisma.leaveRequest.findUnique({
+      where: { id: requestId },
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+      },
+    });
+
+    if (!existing || existing.userId !== userId) {
+      throw new BadRequestException('Leave request not found.');
+    }
+
+    if (existing.status !== LeaveStatus.PENDING) {
+      throw new BadRequestException('Only pending leave requests can be deleted.');
+    }
+
+    await this.prisma.leaveRequest.delete({
+      where: { id: requestId },
+    });
+
+    return { ok: true };
+  }
 }

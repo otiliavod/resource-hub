@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards, UnauthorizedException } from '@nestjs/common';
 import type { Request,Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -45,6 +45,10 @@ export class AuthController {
   @UseGuards(AccessJwtGuard)
   @Get('me')
   async me(@CurrentUser() user: { sub: string }) {
+    if (!user?.sub) {
+      throw new UnauthorizedException();
+    }
+
     return this.auth.getMe(user.sub);
   }
 }
