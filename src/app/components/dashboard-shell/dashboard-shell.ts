@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { map } from 'rxjs/operators';
@@ -12,12 +12,16 @@ import { AuthService } from '../../data/auth.service';
   templateUrl: './dashboard-shell.html',
   styleUrl: './dashboard-shell.scss',
 })
-export class DashboardShellComponent {
+export class DashboardShellComponent implements OnInit {
   private auth = inject(AuthService);
 
-  userLabel$ = this.auth.me().pipe(
-    map((user) => user.fullName || 'User'),
+  userLabel$ = this.auth.currentUser$.pipe(
+    map((user) => user?.fullName || 'User'),
   );
+
+  ngOnInit(): void {
+    this.auth.hydrateCurrentUser().subscribe();
+  }
 
   signOut() {
     this.auth.logout().subscribe(() => {

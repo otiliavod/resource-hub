@@ -1,0 +1,134 @@
+.requests-card {
+  background: var(--rh-card);
+  border: 1px solid var(--rh-border);
+  border-radius: var(--rh-radius-lg);
+  padding: 24px;
+  box-shadow: var(--rh-shadow-md);
+  display: grid;
+  gap: 18px;
+  min-height: 280px;
+}
+
+.card-header {
+  display: grid;
+  gap: 6px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--rh-text);
+  }
+
+  p {
+    margin: 0;
+    color: var(--rh-muted);
+    font-size: 0.95rem;
+  }
+}
+
+.requests-list {
+  display: grid;
+  gap: 12px;
+}
+
+.request-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-radius: 14px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.request-main {
+  min-width: 0;
+}
+
+.request-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--rh-text);
+}
+
+.request-date {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: rgba(15, 23, 42, 0.5);
+}
+
+.request-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.request-status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.status-approved {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #ea980c;
+}
+
+.status-rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.delete-icon {
+  border: none;
+  background: transparent;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(220, 38, 38, 0.85);
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.delete-icon:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+.delete-icon:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.empty-state {
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.03);
+  color: var(--rh-muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 700px) {
+  .request-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .request-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

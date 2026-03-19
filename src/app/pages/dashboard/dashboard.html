@@ -7,6 +7,8 @@
 
     @if (isLoading) {
       <p>Loading dashboard...</p>
+    } @else if (loadError) {
+      <p>{{ loadError }}</p>
     } @else if (summary) {
       <div class="stats-grid">
         @for (stat of summary.stats; track stat.label) {
@@ -30,8 +32,6 @@
           [items]="summary.upcomingLeave"
         ></app-leave-list-card>
       </div>
-    } @else {
-      <p>Unable to load dashboard data.</p>
     }
   </div>
 </app-dashboard-shell>

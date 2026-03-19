@@ -23,13 +23,8 @@ export class AuthService {
   private extractErrorMessage(error: any, fallback: string): string {
     const message = error?.error?.message;
 
-    if (Array.isArray(message) && message.length > 0) {
-      return message.join(' ');
-    }
-
-    if (typeof message === 'string' && message.trim().length > 0) {
-      return message;
-    }
+    if (Array.isArray(message) && message.length > 0) return message.join(' ');
+    if (typeof message === 'string' && message.trim().length > 0) return message;
 
     return fallback;
   }
@@ -41,19 +36,14 @@ export class AuthService {
         this.accessToken$.next(res.accessToken);
         this.currentUser$.next(res.user);
       }),
-      map((): AuthActionResult => ({
-        success: true,
-      })),
+      map((): AuthActionResult => ({ success: true })),
       catchError((error) => {
         const message =
           error?.status === 401
             ? 'Invalid email or password.'
             : this.extractErrorMessage(error, 'Unable to sign in right now.');
 
-        return of<AuthActionResult>({
-          success: false,
-          message,
-        });
+        return of<AuthActionResult>({ success: false, message });
       }),
     );
   }
@@ -65,15 +55,13 @@ export class AuthService {
         this.accessToken$.next(res.accessToken);
         this.currentUser$.next(res.user);
       }),
-      map((): AuthActionResult => ({
-        success: true,
-      })),
-      catchError((error) => {
-        return of<AuthActionResult>({
+      map((): AuthActionResult => ({ success: true })),
+      catchError((error) =>
+        of<AuthActionResult>({
           success: false,
           message: this.extractErrorMessage(error, 'Unable to create your account right now.'),
-        });
-      }),
+        }),
+      ),
     );
   }
 
@@ -105,6 +93,24 @@ export class AuthService {
     );
   }
 
+  hydrateCurrentUser(): Observable<AuthUser | null> {
+    if (this.currentUser$.value) {
+      return of(this.currentUser$.value);
+    }
+
+    if (!this.getAccessToken()) {
+      return of(null);
+    }
+
+    return this.http.get<AuthUser>('/api/auth/me', { withCredentials: true }).pipe(
+      tap((user) => this.currentUser$.next(user)),
+      catchError(() => {
+        this.currentUser$.next(null);
+        return of(null);
+      }),
+    );
+  }
+
   getAccessToken() {
     return localStorage.getItem(this.accessTokenKey);
   }
@@ -113,19 +119,5 @@ export class AuthService {
     localStorage.removeItem(this.accessTokenKey);
     this.accessToken$.next(null);
     this.currentUser$.next(null);
-  }
-
-  me(): Observable<AuthUser> {
-    const cachedUser = this.currentUser$.value;
-
-    if (cachedUser) {
-      return of(cachedUser);
-    }
-
-    return this.http.get<AuthUser>('/api/auth/me', {
-      withCredentials: true,
-    }).pipe(
-      tap((user) => this.currentUser$.next(user)),
-    );
   }
 }

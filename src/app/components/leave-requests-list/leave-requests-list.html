@@ -1,0 +1,47 @@
+<div class="requests-card">
+  <div class="card-header">
+    <h3>Upcoming Leave</h3>
+    <p>Your pending and approved future leave requests.</p>
+  </div>
+
+  @if (items.length === 0) {
+    <div class="empty-state">
+      No upcoming leave requests yet.
+    </div>
+  } @else {
+    <div class="requests-list">
+      @for (item of items; track item.id) {
+        <div class="request-row">
+          <div class="request-main">
+            <div class="request-title">{{ getTypeLabel(item.type) }}</div>
+            <div class="request-date">
+              {{ getDateLabel(item) }} · {{ item.daysCount }} day{{ item.daysCount === 1 ? '' : 's' }}
+            </div>
+          </div>
+
+          <div class="request-actions">
+            <span class="request-status" [class]="'status-' + item.status.toLowerCase()">
+              {{ item.status }}
+            </span>
+
+            @if (canDelete(item)) {
+              <button
+                type="button"
+                class="delete-icon"
+                [disabled]="deletingId === item.id"
+                (click)="requestDelete(item.id)"
+                title="Delete request"
+              >
+                @if (deletingId === item.id) {
+                  <i class="pi pi-spin pi-spinner"></i>
+                } @else {
+                  <i class="pi pi-trash"></i>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

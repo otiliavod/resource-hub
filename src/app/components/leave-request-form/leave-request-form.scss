@@ -1,0 +1,107 @@
+.request-card {
+  background: var(--rh-card);
+  border: 1px solid var(--rh-border);
+  border-radius: var(--rh-radius-lg);
+  padding: 28px;
+  box-shadow: var(--rh-shadow-md);
+  display: grid;
+  gap: 24px;
+}
+
+.card-header {
+  display: grid;
+  gap: 6px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--rh-text);
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0;
+    color: var(--rh-muted);
+    font-size: 0.98rem;
+  }
+}
+
+.request-form {
+  display: grid;
+  gap: 20px;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--rh-text);
+}
+
+.input-shell {
+  display: block;
+}
+
+:host ::ng-deep .rh-input,
+:host ::ng-deep .rh-input.p-inputtext,
+:host ::ng-deep .rh-input .p-select-label,
+:host ::ng-deep .p-select.rh-input,
+:host ::ng-deep textarea.rh-input {
+  width: 100%;
+  border-radius: 12px;
+  min-height: 46px;
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: none;
+}
+
+:host ::ng-deep textarea.rh-textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+:host ::ng-deep .p-select.rh-input {
+  display: flex;
+  align-items: center;
+}
+
+:host ::ng-deep .p-select.rh-input:not(.p-disabled):hover,
+:host ::ng-deep .rh-input:hover,
+:host ::ng-deep textarea.rh-input:hover {
+  border-color: rgba(15, 23, 42, 0.18);
+}
+
+:host ::ng-deep .p-select.rh-input.p-focus,
+:host ::ng-deep .rh-input:focus,
+:host ::ng-deep .rh-input:focus-visible,
+:host ::ng-deep textarea.rh-input:focus {
+  border-color: var(--rh-blue-400);
+  box-shadow: var(--rh-ring);
+  outline: none;
+}
+
+.form-error {
+  font-size: 0.92rem;
+  color: #dc2626;
+  margin-top: -4px;
+}
+
+@media (max-width: 760px) {
+  .request-card {
+    padding: 22px;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}

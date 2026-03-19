@@ -76,6 +76,7 @@ export class AuthInterceptor implements HttpInterceptor {
             this.refreshTokenSubject.next(newToken);
 
             if (!newToken) {
+              this.auth.clear();
               return throwError(() => err);
             }
 

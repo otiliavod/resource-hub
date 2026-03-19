@@ -51,3 +51,78 @@ h1, h2, h3 {
 
   --rh-ring: 0 0 0 3px rgba(79, 130, 217, 0.18);
 }
+
+/* PrimeNG Button Overrides */
+
+.p-button {
+  background: var(--rh-blue-500) !important;
+  border: 1px solid var(--rh-blue-500) !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: none !important;
+}
+
+.p-button:hover {
+  background: var(--rh-blue-600) !important;
+  border-color: var(--rh-blue-600) !important;
+}
+
+.p-button:enabled:active {
+  background: var(--rh-blue-700) !important;
+  border-color: var(--rh-blue-700) !important;
+}
+
+.p-button:focus,
+.p-button:focus-visible,
+.p-button.p-focus {
+  outline: none !important;
+  border-color: var(--rh-blue-500) !important;
+  box-shadow: 0 0 0 3px rgba(59, 109, 204, 0.18) !important;
+}
+
+.p-button:disabled,
+.p-button.p-disabled {
+  background: rgba(59, 109, 204, 0.45) !important;
+  border-color: rgba(59, 109, 204, 0.45) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: none !important;
+}
+
+.p-toast .p-toast-message.p-toast-message-success {
+  border: 1px solid rgba(59, 109, 204, 0.18);
+  background: #ffffff;
+  color: var(--rh-text);
+}
+
+.p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon,
+.p-toast .p-toast-message.p-toast-message-success .p-toast-summary {
+  color: var(--rh-blue-500);
+}
+
+.p-toast .p-toast-message.p-toast-message-error {
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  background: #ffffff;
+  color: var(--rh-text);
+}
+
+/* Input / Select / Textarea shared polish */
+
+.p-inputtext,
+.p-select,
+.p-textarea {
+  border-radius: 12px;
+}
+
+.p-inputtext:focus,
+.p-select.p-focus,
+.p-textarea:focus {
+  border-color: var(--rh-blue-400) !important;
+  box-shadow: var(--rh-ring) !important;
+  outline: none !important;
+}
+
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched,
+.p-inputtext.ng-invalid.ng-touched {
+  box-shadow: none;
+}

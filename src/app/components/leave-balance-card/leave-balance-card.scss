@@ -1,0 +1,40 @@
+.balance-card {
+  background: var(--rh-card);
+  border: 1px solid var(--rh-border);
+  border-radius: var(--rh-radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--rh-shadow-md);
+  display: grid;
+  gap: 10px;
+  min-height: 112px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-label {
+  font-size: 0.95rem;
+  color: var(--rh-muted);
+  font-weight: 500;
+}
+
+.card-header i {
+  color: rgba(15, 23, 42, 0.42);
+  font-size: 1rem;
+}
+
+.card-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--rh-text);
+  line-height: 1.1;
+}
+
+.card-hint {
+  font-size: 0.94rem;
+  color: rgba(15, 23, 42, 0.52);
+}

@@ -1,0 +1,78 @@
+<div class="request-card">
+  <div class="card-header">
+    <h3>Request Leave</h3>
+    <p>Submit a new leave request for approval.</p>
+  </div>
+
+  <form class="request-form" #leaveRequestNgForm="ngForm" (ngSubmit)="submit()">
+    <div class="field">
+      <label for="leaveType">Leave Type</label>
+      <p-select
+        inputId="leaveType"
+        [options]="leaveTypeOptions"
+        [(ngModel)]="type"
+        name="type"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select leave type"
+        styleClass="rh-input"
+      ></p-select>
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="startDate">Start Date</label>
+        <div class="input-shell">
+          <input
+            id="startDate"
+            type="date"
+            pInputText
+            class="rh-input"
+            [(ngModel)]="startDate"
+            name="startDate"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="endDate">End Date</label>
+        <div class="input-shell">
+          <input
+            id="endDate"
+            type="date"
+            pInputText
+            class="rh-input"
+            [(ngModel)]="endDate"
+            name="endDate"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="reason">Reason</label>
+      <textarea
+        id="reason"
+        pTextarea
+        class="rh-input rh-textarea"
+        [(ngModel)]="reason"
+        name="reason"
+        rows="4"
+        placeholder="Optional note for your request"
+      ></textarea>
+    </div>
+
+    @if (errorMessage) {
+      <div class="form-error">{{ errorMessage }}</div>
+    }
+
+    <button
+      pButton
+      type="submit"
+      [label]="isSubmitting ? 'Submitting...' : 'Submit Request'"
+      [disabled]="isSubmitting || !startDate || !endDate"
+    ></button>
+  </form>
+</div>

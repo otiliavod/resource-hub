@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DashboardService } from '../../data/dashboard.service';
@@ -24,9 +24,11 @@ import { DashboardShellComponent } from '../../components/dashboard-shell/dashbo
 })
 export class DashboardPage implements OnInit {
   private dashboardService = inject(DashboardService);
+  private cdr = inject(ChangeDetectorRef);
 
   summary: DashboardSummary | null = null;
   isLoading = true;
+  loadError = '';
 
   ngOnInit(): void {
     this.loadSummary();
@@ -34,39 +36,24 @@ export class DashboardPage implements OnInit {
 
   loadSummary(): void {
     this.isLoading = true;
+    this.loadError = '';
+    this.summary = null;
+    this.cdr.detectChanges();
 
     this.dashboardService.getSummary().subscribe({
       next: (summary) => {
+        console.log('dashboard summary', summary);
         this.summary = summary;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Failed to load dashboard summary', error);
         this.summary = null;
+        this.loadError = 'Unable to load dashboard data.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
     });
-  }
-
-  testLeave() {
-    fetch('/api/leave/request', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + localStorage.getItem('rh_access_token'),
-      },
-      body: JSON.stringify({
-        type: 'ANNUAL',
-        startDate: '2026-03-16',
-        endDate: '2026-03-18',
-        reason: 'Testing leave request',
-      }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        console.log(data);
-        this.loadSummary();
-      })
-      .catch((error) => console.error(error));
   }
 }

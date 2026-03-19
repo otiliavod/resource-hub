@@ -13,6 +13,11 @@ export const appRoutes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'leave',
+    loadComponent: () => import('./pages/leave/leave').then((m) => m.LeavePage),
+    canActivate: [authGuard],
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'dashboard',

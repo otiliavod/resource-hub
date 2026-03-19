@@ -1,0 +1,53 @@
+<p-toast></p-toast>
+
+<app-dashboard-shell>
+  <div class="leave-page">
+    <div class="hero">
+      <h1>Annual Leave</h1>
+      <p>View your leave balance and submit new requests.</p>
+    </div>
+
+    @if (isLoading) {
+      <p>Loading leave data...</p>
+    } @else if (loadError) {
+      <p>{{ loadError }}</p>
+    } @else {
+      <div class="balance-grid">
+        <app-leave-balance-card
+          label="Annual Allowance"
+          [value]="(balance?.annualAllowance ?? 0) + ' days'"
+          hint="Allocated for the current year"
+          icon="pi pi-calendar"
+        ></app-leave-balance-card>
+
+        <app-leave-balance-card
+          label="Used Days"
+          [value]="(balance?.usedDays ?? 0) + ' days'"
+          hint="Already taken this year"
+          icon="pi pi-calendar-minus"
+        ></app-leave-balance-card>
+
+        <app-leave-balance-card
+          label="Remaining"
+          [value]="(balance?.remainingDays ?? 0) + ' days'"
+          hint="Available to request"
+          icon="pi pi-calendar-plus"
+        ></app-leave-balance-card>
+      </div>
+
+      <div class="content-grid">
+        <app-leave-request-form
+          [isSubmitting]="isSubmitting"
+          [errorMessage]="errorMessage"
+          (submitted)="submitLeaveRequest($event)"
+        ></app-leave-request-form>
+
+        <app-leave-requests-list
+          [items]="upcomingItems"
+          [deletingId]="deletingId"
+          (deleteClicked)="deleteLeaveRequest($event)"
+        ></app-leave-requests-list>
+      </div>
+    }
+  </div>
+</app-dashboard-shell>
