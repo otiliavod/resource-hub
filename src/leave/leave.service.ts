@@ -143,6 +143,50 @@ export class LeaveService {
     return (endDate.getTime() - startDate.getTime()) / msPerDay + 1;
   }
 
+  async updateRequest(userId: string, requestId: string, dto: CreateLeaveRequestDto) {
+    const existing = await this.prisma.leaveRequest.findUnique({
+      where: { id: requestId },
+    });
+
+    if (!existing || existing.userId !== userId) {
+      throw new BadRequestException('Leave request not found.');
+    }
+
+    if (existing.status !== LeaveStatus.PENDING) {
+      throw new BadRequestException('Only pending requests can be edited.');
+    }
+
+    const startDate = this.startOfDay(new Date(dto.startDate));
+    const endDate = this.startOfDay(new Date(dto.endDate));
+
+    if (endDate < startDate) {
+      throw new BadRequestException('End date cannot be before start date.');
+    }
+
+    const daysCount = this.calculateInclusiveDays(startDate, endDate);
+
+    const updated = await this.prisma.leaveRequest.update({
+      where: { id: requestId },
+      data: {
+        type: dto.type as LeaveType,
+        startDate,
+        endDate,
+        daysCount,
+        reason: dto.reason?.trim() || null,
+      },
+    });
+
+    return {
+      id: updated.id,
+      type: updated.type,
+      status: updated.status,
+      startDate: updated.startDate.toISOString(),
+      endDate: updated.endDate.toISOString(),
+      daysCount: Number(updated.daysCount),
+      reason: updated.reason,
+    };
+  }
+
   async deleteRequest(userId: string, requestId: string) {
     const existing = await this.prisma.leaveRequest.findUnique({
       where: { id: requestId },

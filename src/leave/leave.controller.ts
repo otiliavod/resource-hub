@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Patch, Post, UnauthorizedException, UseGuards} from '@nestjs/common';
 
 import { LeaveService } from './leave.service';
 import { AccessJwtGuard } from '../auth/guards/access-jwt.guard';
@@ -27,6 +27,19 @@ export class LeaveController {
       @Body() dto: CreateLeaveRequestDto,
   ) {
     return this.leaveService.createRequest(user.sub, dto);
+  }
+
+  @Patch(':id')
+  updateRequest(
+      @CurrentUser() user: JwtPayload,
+      @Param('id') id: string,
+      @Body() dto: CreateLeaveRequestDto,
+  ) {
+    if (!user?.sub) {
+      throw new UnauthorizedException();
+    }
+
+    return this.leaveService.updateRequest(user.sub, id, dto);
   }
 
   @Delete(':id')
