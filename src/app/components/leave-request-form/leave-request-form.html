@@ -33,6 +33,10 @@
             required
           />
         </div>
+
+        @if (touched && !startDate) {
+          <small class="form-error">Start date is required.</small>
+        }
       </div>
 
       <div class="field">
@@ -48,8 +52,16 @@
             required
           />
         </div>
+
+        @if (touched && !endDate) {
+          <small class="form-error">End date is required.</small>
+        }
       </div>
     </div>
+
+    @if (touched && hasInvalidDateRange) {
+      <div class="form-error">End date cannot be before start date.</div>
+    }
 
     <div class="field">
       <label for="reason">Reason</label>
@@ -71,8 +83,8 @@
     <button
       pButton
       type="submit"
-      [label]="isSubmitting ? 'Submitting...' : 'Submit Request'"
-      [disabled]="isSubmitting || !startDate || !endDate"
+      [label]="isSubmitting ? 'Saving...' : submitLabel"
+      [disabled]="isSubmitting || !startDate || !endDate || hasInvalidDateRange"
     ></button>
   </form>
 </div>

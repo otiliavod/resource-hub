@@ -6,7 +6,7 @@
 
   @if (items.length === 0) {
     <div class="empty-state">
-      No upcoming leave requests yet.
+      No leave requests yet. Start by submitting your first request.
     </div>
   } @else {
     <div class="requests-list">
@@ -20,14 +20,23 @@
           </div>
 
           <div class="request-actions">
-            <span class="request-status" [class]="'status-' + item.status.toLowerCase()">
-              {{ item.status }}
-            </span>
+  <span class="request-status" [class]="'status-' + item.status.toLowerCase()">
+    {{ item.status }}
+  </span>
 
-            @if (canDelete(item)) {
+            @if (item.status === 'PENDING') {
               <button
                 type="button"
-                class="delete-icon"
+                class="action-btn edit-btn"
+                (click)="requestEdit(item)"
+                title="Edit request"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+
+              <button
+                type="button"
+                class="action-btn delete-btn"
                 [disabled]="deletingId === item.id"
                 (click)="requestDelete(item.id)"
                 title="Delete request"

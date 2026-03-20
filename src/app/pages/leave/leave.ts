@@ -2,8 +2,9 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { finalize, forkJoin } from 'rxjs';
 
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { DashboardShellComponent } from '../../components/dashboard-shell/dashboard-shell';
 import { LeaveBalanceCardComponent } from '../../components/leave-balance-card/leave-balance-card';
@@ -19,18 +20,20 @@ import { CreateLeaveRequestPayload, LeaveBalance, LeaveRequestItem } from '../..
   imports: [
     CommonModule,
     ToastModule,
+    ConfirmDialogModule,
     DashboardShellComponent,
     LeaveBalanceCardComponent,
     LeaveRequestFormComponent,
     LeaveRequestsListComponent,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './leave.html',
   styleUrl: './leave.scss',
 })
 export class LeavePage implements OnInit {
   private leaveService = inject(LeaveService);
   private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
   private cdr = inject(ChangeDetectorRef);
 
   @ViewChild(LeaveRequestFormComponent) leaveForm?: LeaveRequestFormComponent;
@@ -38,6 +41,7 @@ export class LeavePage implements OnInit {
   balance: LeaveBalance | null = null;
   upcomingItems: LeaveRequestItem[] = [];
   deletingId: string | null = null;
+  editingItem: LeaveRequestItem | null = null;
 
   isLoading = true;
   isSubmitting = false;
@@ -86,8 +90,11 @@ export class LeavePage implements OnInit {
     this.isSubmitting = true;
     this.cdr.detectChanges();
 
-    this.leaveService
-      .createRequest(payload)
+    const request$ = this.editingItem
+      ? this.leaveService.updateRequest(this.editingItem.id, payload)
+      : this.leaveService.createRequest(payload);
+
+    request$
       .pipe(
         finalize(() => {
           this.isSubmitting = false;
@@ -95,19 +102,32 @@ export class LeavePage implements OnInit {
         }),
       )
       .subscribe({
-        next: (created) => {
-          this.upcomingItems = [created, ...this.upcomingItems].sort(
-            (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
-          );
+        next: (result: LeaveRequestItem) => {
+          if (this.editingItem) {
+            this.upcomingItems = this.upcomingItems.map((item) =>
+              item.id === result.id ? result : item,
+            );
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Request updated',
+              detail: 'Your leave request was updated successfully.',
+            });
+
+            this.editingItem = null;
+          } else {
+            this.upcomingItems = [result, ...this.upcomingItems].sort(
+              (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+            );
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Request submitted',
+              detail: 'Your leave request was submitted successfully.',
+            });
+          }
 
           this.leaveForm?.resetForm();
-
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Request submitted',
-            detail: 'Your leave request was submitted successfully.',
-          });
-
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -116,11 +136,13 @@ export class LeavePage implements OnInit {
             ? message.join(' ')
             : typeof message === 'string' && message.trim()
               ? message
-              : 'Unable to submit leave request right now.';
+              : this.editingItem
+                ? 'Unable to update leave request right now.'
+                : 'Unable to submit leave request right now.';
 
           this.messageService.add({
             severity: 'error',
-            summary: 'Request failed',
+            summary: this.editingItem ? 'Update failed' : 'Request failed',
             detail: this.errorMessage,
           });
 
@@ -129,52 +151,79 @@ export class LeavePage implements OnInit {
       });
   }
 
+  onEdit(item: LeaveRequestItem): void {
+    this.editingItem = item;
+    this.errorMessage = '';
+    this.leaveForm?.prefill(item);
+    this.cdr.detectChanges();
+  }
+
+  cancelEdit(): void {
+    this.editingItem = null;
+    this.errorMessage = '';
+    this.leaveForm?.resetForm();
+    this.cdr.detectChanges();
+  }
+
   deleteLeaveRequest(id: string): void {
-    const confirmed = window.confirm('Delete this leave request?');
-    if (!confirmed || this.deletingId) {
+    if (this.deletingId) {
       return;
     }
 
-    this.deletingId = id;
-    this.errorMessage = '';
-    this.cdr.detectChanges();
+    this.confirmationService.confirm({
+      header: 'Delete leave request?',
+      message: 'This will remove the pending leave request.',
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.deletingId = id;
+        this.errorMessage = '';
+        this.cdr.detectChanges();
 
-    this.leaveService
-      .deleteRequest(id)
-      .pipe(
-        finalize(() => {
-          this.deletingId = null;
-          this.cdr.detectChanges();
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.upcomingItems = this.upcomingItems.filter((item) => item.id !== id);
+        this.leaveService
+          .deleteRequest(id)
+          .pipe(
+            finalize(() => {
+              this.deletingId = null;
+              this.cdr.detectChanges();
+            }),
+          )
+          .subscribe({
+            next: () => {
+              this.upcomingItems = this.upcomingItems.filter((item) => item.id !== id);
 
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Request deleted',
-            detail: 'Your leave request was deleted.',
+              if (this.editingItem?.id === id) {
+                this.cancelEdit();
+              }
+
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Request deleted',
+                detail: 'Your leave request was deleted.',
+              });
+
+              this.cdr.detectChanges();
+            },
+            error: (error) => {
+              const message = error?.error?.message;
+              const detail = Array.isArray(message)
+                ? message.join(' ')
+                : typeof message === 'string' && message.trim()
+                  ? message
+                  : 'Unable to delete leave request right now.';
+
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Delete failed',
+                detail,
+              });
+
+              this.cdr.detectChanges();
+            },
           });
-
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          const message = error?.error?.message;
-          const detail = Array.isArray(message)
-            ? message.join(' ')
-            : typeof message === 'string' && message.trim()
-              ? message
-              : 'Unable to delete leave request right now.';
-
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Delete failed',
-            detail,
-          });
-
-          this.cdr.detectChanges();
-        },
-      });
+      },
+    });
   }
 }

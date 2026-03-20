@@ -6,9 +6,20 @@
     </div>
 
     @if (isLoading) {
-      <p>Loading dashboard...</p>
+      <div class="skeleton-grid">
+        <div class="skeleton-stats">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+
+        <div class="content-grid">
+          <div class="skeleton-panel"></div>
+          <div class="skeleton-panel"></div>
+        </div>
+      </div>
     } @else if (loadError) {
-      <p>{{ loadError }}</p>
+      <div class="page-feedback">{{ loadError }}</div>
     } @else if (summary) {
       <div class="stats-grid">
         @for (stat of summary.stats; track stat.label) {

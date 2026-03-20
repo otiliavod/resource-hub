@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
 <app-dashboard-shell>
   <div class="leave-page">
@@ -8,9 +9,20 @@
     </div>
 
     @if (isLoading) {
-      <p>Loading leave data...</p>
+      <div class="skeleton-grid">
+        <div class="skeleton-balance">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+
+        <div class="content-grid">
+          <div class="skeleton-panel"></div>
+          <div class="skeleton-panel"></div>
+        </div>
+      </div>
     } @else if (loadError) {
-      <p>{{ loadError }}</p>
+      <div class="page-feedback">{{ loadError }}</div>
     } @else {
       <div class="balance-grid">
         <app-leave-balance-card
@@ -36,16 +48,46 @@
       </div>
 
       <div class="content-grid">
-        <app-leave-request-form
-          [isSubmitting]="isSubmitting"
-          [errorMessage]="errorMessage"
-          (submitted)="submitLeaveRequest($event)"
-        ></app-leave-request-form>
+        <div class="form-stack">
+          @if (editingItem) {
+            <div class="edit-banner">
+              <div class="edit-banner-copy">
+                <strong>Editing request</strong>
+                <span>
+                  {{ editingItem.type === 'ANNUAL' ? 'Annual Leave' :
+                  editingItem.type === 'PERSONAL' ? 'Personal Leave' :
+                    editingItem.type === 'SICK' ? 'Sick Leave' : 'Unpaid Leave' }}
+                  ·
+                  {{ editingItem.startDate | date:'MMM d' }}
+                  @if (editingItem.startDate !== editingItem.endDate) {
+                    –{{ editingItem.endDate | date:'MMM d' }}
+                  }
+                </span>
+              </div>
+
+              <button
+                type="button"
+                class="edit-cancel-btn"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+            </div>
+          }
+
+          <app-leave-request-form
+            [isSubmitting]="isSubmitting"
+            [errorMessage]="errorMessage"
+            [submitLabel]="editingItem ? 'Update Request' : 'Submit Request'"
+            (submitted)="submitLeaveRequest($event)"
+          ></app-leave-request-form>
+        </div>
 
         <app-leave-requests-list
           [items]="upcomingItems"
           [deletingId]="deletingId"
           (deleteClicked)="deleteLeaveRequest($event)"
+          (editClicked)="onEdit($event)"
         ></app-leave-requests-list>
       </div>
     }

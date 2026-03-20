@@ -1,20 +1,21 @@
 .leave-card {
   background: var(--rh-card);
-  border: 1px solid var(--rh-border);
-  border-radius: var(--rh-radius-lg);
-  padding: 22px 24px;
-  min-height: 250px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
+  padding: 26px;
+  min-height: 320px;
   height: 100%;
   display: grid;
   gap: 18px;
-  box-shadow: var(--rh-shadow-md);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.03);
 }
 
 .card-header h3 {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.28rem;
+  font-weight: 750;
   color: var(--rh-text);
+  letter-spacing: -0.025em;
 }
 
 .leave-list {
@@ -28,9 +29,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 16px;
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.03);
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.024);
   border: 1px solid rgba(15, 23, 42, 0.05);
 }
 
@@ -39,25 +40,26 @@
 }
 
 .leave-title {
-  font-size: 0.98rem;
-  font-weight: 600;
+  font-size: 0.99rem;
+  font-weight: 680;
   color: var(--rh-text);
 }
 
 .leave-date {
   margin-top: 4px;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: rgba(15, 23, 42, 0.5);
 }
 
 .leave-status {
   flex-shrink: 0;
-  padding: 6px 12px;
+  padding: 7px 12px;
   border-radius: 999px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-transform: capitalize;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   line-height: 1;
+  text-transform: capitalize;
 }
 
 .status-approved {

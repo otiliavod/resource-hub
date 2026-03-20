@@ -1,9 +1,9 @@
 .request-card {
   background: var(--rh-card);
-  border: 1px solid var(--rh-border);
-  border-radius: var(--rh-radius-lg);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
   padding: 28px;
-  box-shadow: var(--rh-shadow-md);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.03);
   display: grid;
   gap: 24px;
 }
@@ -14,16 +14,16 @@
 
   h3 {
     margin: 0;
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: 1.28rem;
+    font-weight: 750;
     color: var(--rh-text);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   p {
     margin: 0;
-    color: var(--rh-muted);
-    font-size: 0.98rem;
+    color: rgba(15, 23, 42, 0.54);
+    font-size: 0.97rem;
   }
 }
 
@@ -44,8 +44,8 @@
 }
 
 .field label {
-  font-size: 0.94rem;
-  font-weight: 600;
+  font-size: 0.93rem;
+  font-weight: 650;
   color: var(--rh-text);
 }
 
@@ -59,15 +59,18 @@
 :host ::ng-deep .p-select.rh-input,
 :host ::ng-deep textarea.rh-input {
   width: 100%;
-  border-radius: 12px;
-  min-height: 46px;
-  border-color: rgba(15, 23, 42, 0.12);
+  min-height: 48px;
+  border-radius: 14px;
+  border-color: rgba(15, 23, 42, 0.1);
   box-shadow: none;
+  background: #fff;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
 }
 
 :host ::ng-deep textarea.rh-textarea {
-  min-height: 112px;
+  min-height: 118px;
   resize: vertical;
+  padding-top: 12px;
 }
 
 :host ::ng-deep .p-select.rh-input {
@@ -78,7 +81,7 @@
 :host ::ng-deep .p-select.rh-input:not(.p-disabled):hover,
 :host ::ng-deep .rh-input:hover,
 :host ::ng-deep textarea.rh-input:hover {
-  border-color: rgba(15, 23, 42, 0.18);
+  border-color: rgba(15, 23, 42, 0.16);
 }
 
 :host ::ng-deep .p-select.rh-input.p-focus,
@@ -93,7 +96,7 @@
 .form-error {
   font-size: 0.92rem;
   color: #dc2626;
-  margin-top: -4px;
+  margin-top: -2px;
 }
 
 @media (max-width: 760px) {

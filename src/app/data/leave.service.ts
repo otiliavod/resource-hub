@@ -15,15 +15,23 @@ import {
 export class LeaveService {
   constructor(private http: HttpClient) {}
 
-  getBalance() {
+  getBalance(): Observable<LeaveBalance> {
     return this.http.get<LeaveBalance>('/api/leave/balance', {
-      headers: { 'Cache-Control': 'no-cache' },
+      withCredentials: true,
+      headers: {
+        'Cache-Control': 'no-cache',
+        Pragma: 'no-cache',
+      },
     });
   }
 
-  getUpcoming() {
-    return this.http.get<{ items: LeaveRequestItem[] }>('/api/leave/upcoming', {
-      headers: { 'Cache-Control': 'no-cache' },
+  getUpcoming(): Observable<LeaveUpcomingResponse> {
+    return this.http.get<LeaveUpcomingResponse>('/api/leave/upcoming', {
+      withCredentials: true,
+      headers: {
+        'Cache-Control': 'no-cache',
+        Pragma: 'no-cache',
+      },
     });
   }
 
@@ -33,7 +41,13 @@ export class LeaveService {
     });
   }
 
-  deleteRequest(id: string) {
+  updateRequest(id: string, payload: CreateLeaveRequestPayload): Observable<LeaveRequestItem> {
+    return this.http.patch<LeaveRequestItem>(`/api/leave/${id}`, payload, {
+      withCredentials: true,
+    });
+  }
+
+  deleteRequest(id: string): Observable<{ ok: true }> {
     return this.http.delete<{ ok: true }>(`/api/leave/${id}`, {
       withCredentials: true,
     });

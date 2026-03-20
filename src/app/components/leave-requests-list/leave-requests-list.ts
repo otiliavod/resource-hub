@@ -15,6 +15,7 @@ export class LeaveRequestsListComponent {
   @Input() deletingId: string | null = null;
 
   @Output() deleteClicked = new EventEmitter<string>();
+  @Output() editClicked = new EventEmitter<LeaveRequestItem>();
 
   getTypeLabel(type: LeaveRequestItem['type']) {
     switch (type) {
@@ -43,6 +44,10 @@ export class LeaveRequestsListComponent {
 
   requestDelete(id: string) {
     this.deleteClicked.emit(id);
+  }
+
+  requestEdit(item: LeaveRequestItem) {
+    this.editClicked.emit(item);
   }
 
   private formatShortDate(value: string) {
