@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Resource Hub
 
 Resource Hub is a full-stack web application for managing clients, projects, timesheets, and employee leave in one place.
