@@ -84,10 +84,13 @@
         </div>
 
         <app-leave-requests-list
-          [items]="upcomingItems"
+          [items]="sortedItems"
+          [activeFilter]="activeFilter"
+          [activeSort]="activeSort"
           [deletingId]="deletingId"
           (deleteClicked)="deleteLeaveRequest($event)"
-          (editClicked)="onEdit($event)"
+          (filterChanged)="activeFilter = $event"
+          (sortChanged)="activeSort = $event"
         ></app-leave-requests-list>
       </div>
     }

@@ -12,7 +12,14 @@ import { LeaveRequestFormComponent } from '../../components/leave-request-form/l
 import { LeaveRequestsListComponent } from '../../components/leave-requests-list/leave-requests-list';
 
 import { LeaveService } from '../../data/leave.service';
-import { CreateLeaveRequestPayload, LeaveBalance, LeaveRequestItem } from '../../data/leave.models';
+import {
+  CreateLeaveRequestPayload,
+  LeaveBalance,
+  LeaveRequestItem,
+  LeaveStatus,
+} from '../../data/leave.models';
+
+type LeaveFilter = 'ALL' | LeaveStatus;
 
 @Component({
   selector: 'app-leave-page',
@@ -35,6 +42,7 @@ export class LeavePage implements OnInit {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private cdr = inject(ChangeDetectorRef);
+  activeSort: 'ASC' | 'DESC' = 'ASC';
 
   @ViewChild(LeaveRequestFormComponent) leaveForm?: LeaveRequestFormComponent;
 
@@ -43,6 +51,8 @@ export class LeavePage implements OnInit {
   deletingId: string | null = null;
   editingItem: LeaveRequestItem | null = null;
 
+  activeFilter: LeaveFilter = 'ALL';
+
   isLoading = true;
   isSubmitting = false;
   errorMessage = '';
@@ -50,6 +60,32 @@ export class LeavePage implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+  }
+
+  get filteredItems(): LeaveRequestItem[] {
+    if (this.activeFilter === 'ALL') {
+      return this.upcomingItems;
+    }
+
+    return this.upcomingItems.filter((item) => item.status === this.activeFilter);
+  }
+
+  setFilter(filter: LeaveFilter): void {
+    this.activeFilter = filter;
+    this.cdr.detectChanges();
+  }
+
+  get sortedItems(): LeaveRequestItem[] {
+    const items = [...this.filteredItems];
+
+    return items.sort((a, b) => {
+      const aTime = new Date(a.startDate).getTime();
+      const bTime = new Date(b.startDate).getTime();
+
+      return this.activeSort === 'ASC'
+        ? aTime - bTime
+        : bTime - aTime;
+    });
   }
 
   loadData(): void {
@@ -125,6 +161,8 @@ export class LeavePage implements OnInit {
               summary: 'Request submitted',
               detail: 'Your leave request was submitted successfully.',
             });
+
+            this.activeFilter = 'ALL';
           }
 
           this.leaveForm?.resetForm();

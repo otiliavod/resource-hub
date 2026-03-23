@@ -1,12 +1,38 @@
 <div class="requests-card">
   <div class="card-header">
-    <h3>Upcoming Leave</h3>
-    <p>Your pending and approved future leave requests.</p>
+    <div class="card-heading">
+      <h3>Upcoming Leave</h3>
+      <p>Your pending and approved future leave requests.</p>
+    </div>
+
+    <div class="controls-row">
+      <div class="filter-row">
+        <p-select
+          [options]="filters"
+          [ngModel]="activeFilter"
+          (ngModelChange)="onFilterChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+
+      <div class="filter-row">
+        <p-select
+          [options]="sortOptions"
+          [ngModel]="activeSort"
+          (ngModelChange)="onSortChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+    </div>
   </div>
 
   @if (items.length === 0) {
     <div class="empty-state">
-      No leave requests yet. Start by submitting your first request.
+      No requests match this filter yet.
     </div>
   } @else {
     <div class="requests-list">
@@ -20,9 +46,9 @@
           </div>
 
           <div class="request-actions">
-  <span class="request-status" [class]="'status-' + item.status.toLowerCase()">
-    {{ item.status }}
-  </span>
+            <span class="request-status" [class]="'status-' + item.status.toLowerCase()">
+              {{ item.status }}
+            </span>
 
             @if (item.status === 'PENDING') {
               <button

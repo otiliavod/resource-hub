@@ -11,6 +11,11 @@
 
 .card-header {
   display: grid;
+  gap: 14px;
+}
+
+.card-heading {
+  display: grid;
   gap: 6px;
 
   h3 {
@@ -28,6 +33,43 @@
   }
 }
 
+.controls-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-row {
+  display: grid;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.filter-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(15, 23, 42, 0.58);
+}
+
+:host ::ng-deep .filter-select,
+:host ::ng-deep .filter-select.p-select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 12px;
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: none;
+  background: #fff;
+}
+
+:host ::ng-deep .filter-select.p-select:not(.p-disabled):hover {
+  border-color: rgba(15, 23, 42, 0.16);
+}
+
+:host ::ng-deep .filter-select.p-select.p-focus {
+  border-color: var(--rh-blue-400);
+  box-shadow: var(--rh-ring);
+}
+
 .requests-list {
   display: grid;
   gap: 12px;
@@ -38,8 +80,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  padding: 16px;
   border-radius: 16px;
-  padding: 16px 16px;
   background: rgba(15, 23, 42, 0.024);
   border: 1px solid rgba(15, 23, 42, 0.05);
 }
@@ -63,14 +105,14 @@
 .request-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .request-status {
-  padding: 7px 12px;
+  padding: 6px 10px;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1;
@@ -91,28 +133,47 @@
   color: #dc2626;
 }
 
-.delete-icon {
-  border: none;
-  background: transparent;
-  width: 34px;
-  height: 34px;
+.action-btn {
+  width: 32px;
+  height: 32px;
   border-radius: 10px;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(220, 38, 38, 0.82);
   cursor: pointer;
-  transition: background-color 0.18s ease, color 0.18s ease;
+  background: rgba(15, 23, 42, 0.04);
+  color: rgba(15, 23, 42, 0.6);
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+
+  i {
+    font-size: 0.86rem;
+  }
 }
 
-.delete-icon:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.08);
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.edit-btn:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
   color: #dc2626;
 }
 
-.delete-icon:disabled {
-  opacity: 0.55;
-  cursor: default;
+.delete-btn:disabled,
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .empty-state {
@@ -121,57 +182,6 @@
   background: rgba(15, 23, 42, 0.03);
   color: var(--rh-muted);
   font-size: 0.95rem;
-}
-
-.request-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.action-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-
-  background: rgba(0, 0, 0, 0.04);
-  color: #555;
-
-  transition: all 0.2s ease;
-
-  i {
-    font-size: 0.9rem;
-  }
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-/* EDIT */
-.edit-btn:hover {
-  background: rgba(59, 130, 246, 0.1); // blue tint
-  color: #2563eb;
-}
-
-/* DELETE */
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
-
-.delete-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 @media (max-width: 700px) {
@@ -183,5 +193,9 @@
   .request-actions {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .filter-row {
+    max-width: 100%;
   }
 }
