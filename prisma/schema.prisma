@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                 String          @id @default(cuid())
+  email              String          @unique
+  fullName           String
+  role               Role            @default(DEV)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  passwordHash       String
+  projectMemberships ProjectMember[]
+  refreshTokens      RefreshToken[]
+  timeEntries        TimeEntry[]
+  leaveBalance       LeaveBalance?
+  leaveRequests      LeaveRequest[]
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  name        String
+  code        String?         @unique
+  clientId    String
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  client      Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  members     ProjectMember[]
+  timeEntries TimeEntry[]
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model TimeEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  projectId   String
+  date        DateTime
+  minutes     Int
+  description String?
+  isBillable  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model LeaveBalance {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  annualAllowance Int      @default(25)
+  usedDays        Decimal  @default(0) @db.Decimal(5, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LeaveRequest {
+  id        String      @id @default(cuid())
+  userId    String
+  type      LeaveType   @default(ANNUAL)
+  status    LeaveStatus @default(PENDING)
+  startDate DateTime
+  endDate   DateTime
+  daysCount Decimal     @db.Decimal(5, 2)
+  reason    String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startDate])
+  @@index([userId, status])
+  @@index([status, startDate])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  DEV
+}
+
+enum LeaveType {
+  ANNUAL
+  PERSONAL
+  SICK
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
