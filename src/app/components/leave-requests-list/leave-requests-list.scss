@@ -33,16 +33,10 @@
   }
 }
 
-.controls-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
 .filter-row {
   display: grid;
-  gap: 6px;
-  min-width: 180px;
+  gap: 8px;
+  max-width: 220px;
 }
 
 .filter-label {

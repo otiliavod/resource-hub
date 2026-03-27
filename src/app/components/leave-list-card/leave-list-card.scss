@@ -1,0 +1,85 @@
+.leave-card {
+  background: var(--rh-card);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
+  padding: 26px;
+  min-height: 320px;
+  height: 100%;
+  display: grid;
+  gap: 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.03);
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.28rem;
+  font-weight: 750;
+  color: var(--rh-text);
+  letter-spacing: -0.025em;
+}
+
+.leave-list {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.leave-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.024);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.leave-main {
+  min-width: 0;
+}
+
+.leave-title {
+  font-size: 0.99rem;
+  font-weight: 680;
+  color: var(--rh-text);
+}
+
+.leave-date {
+  margin-top: 4px;
+  font-size: 0.92rem;
+  color: rgba(15, 23, 42, 0.5);
+}
+
+.leave-status {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.status-approved {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #ea980c;
+}
+
+.status-rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+@media (max-width: 700px) {
+  .leave-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

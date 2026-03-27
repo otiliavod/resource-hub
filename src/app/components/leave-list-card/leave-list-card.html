@@ -1,0 +1,20 @@
+<div class="leave-card">
+  <div class="card-header">
+    <h3>{{ title }}</h3>
+  </div>
+
+  <div class="leave-list">
+    @for (item of items; track item.title + item.dateLabel) {
+      <div class="leave-row">
+        <div class="leave-main">
+          <div class="leave-title">{{ item.title }}</div>
+          <div class="leave-date">{{ item.dateLabel }}</div>
+        </div>
+
+        <span class="leave-status" [class]="'leave-status status-' + item.status">
+          {{ item.status }}
+        </span>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<div class="auth-page">
+  <p-card class="auth-card">
+    <div class="auth-header">
+      <h1>{{ title }}</h1>
+      @if (subtitle) {
+        <p class="subtitle">{{ subtitle }}</p>
+      }
+    </div>
+
+    <ng-content></ng-content>
+  </p-card>
+</div>

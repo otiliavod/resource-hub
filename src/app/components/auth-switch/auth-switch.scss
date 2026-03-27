@@ -1,0 +1,61 @@
+.switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  background: rgba(53, 106, 195, 0.10);
+  border-radius: 10px;
+
+  padding: 4px;
+  margin-top: 12px;
+
+  height: 42px;
+}
+
+.tab {
+  position: relative;
+  z-index: 2;
+
+  border: none;
+  background: transparent;
+
+  font-weight: 700;
+  color: var(--rh-text);
+
+  cursor: pointer;
+  border-radius: 8px;
+
+  transition: color 0.2s ease;
+}
+
+.tab.active {
+  color: white;
+}
+
+/* sliding blue background */
+.slider {
+  position: absolute;
+
+  top: 4px;
+  left: 4px;
+
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+
+  border-radius: 8px;
+
+  background: linear-gradient(
+      180deg,
+      #4f82d9,
+      #356ac3
+  );
+
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+
+  transition: transform 0.25s ease;
+}
+
+/* slide to Sign Up */
+.slider.signup {
+  transform: translateX(100%);
+}

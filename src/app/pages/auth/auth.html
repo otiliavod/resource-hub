@@ -1,0 +1,120 @@
+<app-auth-shell
+  title="Welcome to Resource Hub"
+  subtitle="Manage clients, projects, timesheets and billing — all in one place."
+>
+  <app-auth-switch [mode]="mode" (modeChange)="setMode($event)"></app-auth-switch>
+
+  <div class="content">
+    @if (errorMessage) {
+      <div class="auth-error">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <form class="form" (ngSubmit)="submit()" #f="ngForm">
+      @if (mode === 'signin') {
+        <label class="field">
+          <span>Email</span>
+          <input
+            pInputText
+            name="email"
+            [(ngModel)]="email"
+            type="email"
+            placeholder="you@email.com"
+            required
+            autocomplete="email"
+            [disabled]="isSubmitting"
+          />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <p-password
+            name="password"
+            [(ngModel)]="password"
+            [toggleMask]="true"
+            [feedback]="false"
+            placeholder="Your password"
+            required
+            autocomplete="current-password"
+            [disabled]="isSubmitting"
+          ></p-password>
+        </label>
+
+        <button
+          pButton
+          type="submit"
+          class="primary"
+          [disabled]="!f.valid || isSubmitting"
+        >
+          {{ isSubmitting ? 'Please wait...' : 'Sign In' }}
+        </button>
+      }
+
+      @if (mode === 'signup') {
+        <label class="field">
+          <span>Name</span>
+          <input
+            pInputText
+            name="fullName"
+            [(ngModel)]="fullName"
+            type="text"
+            placeholder="Your name"
+            required
+            autocomplete="name"
+            [disabled]="isSubmitting"
+          />
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input
+            pInputText
+            name="email"
+            [(ngModel)]="email"
+            type="email"
+            placeholder="you@email.com"
+            required
+            autocomplete="email"
+            [disabled]="isSubmitting"
+          />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <p-password
+            name="password"
+            [(ngModel)]="password"
+            [toggleMask]="true"
+            [feedback]="false"
+            placeholder="Create a password"
+            required
+            autocomplete="new-password"
+            [disabled]="isSubmitting"
+          ></p-password>
+        </label>
+
+        <div class="password-hint">
+          Password must be at least 8 characters and include an uppercase letter,
+          lowercase letter, number, and symbol.
+        </div>
+
+        <button
+          pButton
+          type="submit"
+          class="primary"
+          [disabled]="!f.valid || isSubmitting"
+        >
+          {{ isSubmitting ? 'Please wait...' : 'Create Account' }}
+        </button>
+
+        <p-divider></p-divider>
+
+        <p class="hint">
+          Already have an account?
+          <a (click)="setMode('signin')">Sign in</a>
+        </p>
+      }
+    </form>
+  </div>
+</app-auth-shell>
